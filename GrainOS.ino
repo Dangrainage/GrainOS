@@ -4,6 +4,9 @@ struct File {
     bool used;
 };
 
+bool readingPin = false;
+int readingPinNumber = -1;
+
 const int MAX_FILES = 5;  //file limit
 File files[MAX_FILES];     
 
@@ -68,7 +71,7 @@ void showHelp() { //I think this is fairly self explanatory, but still, making s
     Serial.println("  help - Displays this help message");
     Serial.println("  calc <number> <operator> <number> - calculates command");
     Serial.println("  run <script.gs> - Runs a script file");
-    Serial.println("  loop <number> <command> - Loops a command the inputted amout of times");
+    Serial.println("  loop <number> <command> - Loops a command the inputted amount of times");
     //Serial.println("  high <pin-number> - sets the inputted pin to high");// 12
     //Serial.println("  low <pin-number> - sets the inputted pin to low"); //13
 }
@@ -200,6 +203,26 @@ void setPinHigh(String input) {
 
 }
 
+void setPinRead(String input) {
+  int pin = input.toInt();
+  if (pin >= 0){
+    pinMode(pin, INPUT);
+    Serial.println("Pin " + String(pin) + " listening, cancel with canc");
+    readingPin = true;
+    readingPinNumber = pin;
+  } 
+  else {
+    Serial.println("Invalid pin number");
+  }
+
+}
+
+void cancelPinRead() {
+    readingPin = false;
+    readingPinNumber = -1;
+    Serial.println("Stopped listening");
+}
+
 
 
 void processCommand(String input) {
@@ -260,6 +283,12 @@ void processCommand(String input) {
     else if (input.startsWith("low ")){
       setPinLow(input.substring(4));
     }
+    else if (input.startsWith("listen ")){
+      setPinRead(input.substring(7));
+    }
+    else if (input == "canc") {
+        cancelPinRead();
+    }
     else {
         Serial.println("Unknown command " + input); //changed this because I realized It makes more sense
     }
@@ -268,7 +297,7 @@ void processCommand(String input) {
 void setup() {
     Serial.begin(9600);
     delay(500);
-    Serial.println("Welcome to GrainOS 1.8.3, `help` for a list of commands");
+    Serial.println("Welcome to GrainOS 1.9.3, `help` for a list of commands");
 }
 
 void loop() { //the script runner :)
@@ -282,5 +311,11 @@ void loop() { //the script runner :)
         } else {
             processCommand(input);
         }
+    }
+    if (readingPin == true) {
+        int pinValue = digitalRead(readingPinNumber);
+        //Serial.println("Pin " + String(readingPinNumber) + " value: " + String(pinValue));
+        delay(500);
+        Serial.println(pinValue);
     }
 }
