@@ -206,7 +206,7 @@ void setPinHigh(String input) {
 void setPinRead(String input) {
   int pin = input.toInt();
   if (pin >= 0){
-    pinMode(pin, INPUT);
+    pinMode(pin, INPUT_PULLUP);
     Serial.println("Pin " + String(pin) + " listening, cancel with canc");
     readingPin = true;
     readingPinNumber = pin;
@@ -297,7 +297,7 @@ void processCommand(String input) {
 void setup() {
     Serial.begin(9600);
     delay(500);
-    Serial.println("Welcome to GrainOS 1.9.3, `help` for a list of commands");
+    Serial.println("Welcome to GrainOS 1.9.4, `help` for a list of commands");
 }
 
 void loop() { //the script runner :)
